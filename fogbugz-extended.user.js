@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.2.2
+// @version      1.2.3
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
@@ -74,7 +74,11 @@
         const seperator = ", ";
         var history = "";
 
-        $("div.changes:contains(to '" + mapCaseStateToDescription(caseState) + "')")
+        var selector = (caseState && caseState.contains("Completed"))
+        ? "div.changes:contains(to '" + mapCaseStateToDescription(caseState) + "')"
+        : "div.changes:contains(from '" + mapCaseStateToDescription(caseState) + "')";
+
+        $(selector)
             .parent()
             .find(".summary")
             .each(function(i,o) {
