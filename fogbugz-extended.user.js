@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.3.1
+// @version      1.3.2
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
@@ -183,7 +183,8 @@
 
     var createThemeSwitch = function() {
         $(".gw-nav-entry-time")
-        .append('<li class="gw-nav-link">Sucky <label class="switch donotinvert"><input id="themeswitch" type="checkbox"><span class="slider round"></span></label> Cool</li>');
+        .parent()
+        .append('<li class="gw-nav-link"><h3>Theme</h3><hr />Sucky <label class="switch donotinvert"><input id="themeswitch" type="checkbox"><span class="slider round"></span></label> Cool</li>');
 
         if(localStorage.getItem("theme") == "dark"){
             $("#themeswitch").attr("checked", "");
