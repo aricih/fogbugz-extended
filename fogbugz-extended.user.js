@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.2.1
+// @version      1.2.2
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
