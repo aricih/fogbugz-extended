@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.2.3
+// @version      1.2.4
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
@@ -123,7 +123,7 @@
 
         if(history.length > 0) {
             actionButton.attr("title", history);
-            actionButton.html(label + " <span style='font-weight:bold; color:green !important;'>✓</b>");
+            actionButton.html(label + " <span class='donotinvert' style='font-weight:bold; color:#65cc8b !important;'>✓</b>");
         }
 
         actionButton.prop("initialized", true);
