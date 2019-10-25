@@ -108,6 +108,7 @@
             actionButton
                 .css("font-weight","Bold")
                 .css("border", "2px solid")
+                .css("border-radius", "4px")
                 .removeAttr("href");
         }
         else{
