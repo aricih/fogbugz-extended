@@ -2,7 +2,7 @@
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
 // @version      1.2.0
-// @updateURL    https://gist.github.com/aricih/46e8c61eb992b5679dc68ce5657790de/raw/fogbugz-extended.user.js
+// @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
 // @include      https://msltd.fogbugz.com*
