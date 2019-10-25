@@ -138,7 +138,7 @@
             parentElem.prepend("<hr id='divider' style='margin-left: 8px !important;'/>");
         }
 
-        var caseCategory = $(".case-category").attr("title");
+        var caseCategory = $(".case * .case-category").attr("title");
 
         if(!caseCategory) {
             return;
