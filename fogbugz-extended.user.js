@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.5.0
+// @version      1.5.1
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
@@ -381,6 +381,10 @@
         }
 
         _createCaseRelatedControls() {
+            if(!this._isSupportCase(false)) {
+                return;
+            }
+
             // Cache the built link to prevent re-calculation.
             this.zendeskLink = this._buildZendeskLink();
 
@@ -403,11 +407,6 @@
             this.tags = $('#sidebarTags li a').map((i, o) => $(o).text()).get();
 
             this._createGenericControls();
-
-            if(!this._isSupportCase(false)) {
-                return;
-            }
-
             this._createCaseRelatedControls();
         }
     };
