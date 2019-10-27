@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.4.0
+// @version      1.5.0
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
@@ -31,7 +31,7 @@
 
     // Abstract DomExtension class
     class DomExtension extends Extension {
-        createDomElementOnce(parentElem, elem, elemId, withPadding) {
+        createDomElementOnce(parentElem, elem, elemId, withPadding, shouldAppend) {
             var existingElem = parentElem.find("#"+elemId);
 
             if(existingElem.length > 0) {
@@ -45,13 +45,18 @@
             elem.attr("id", elemId);
 
             if(withPadding) {
-                elem.attr("style", "padding: 2px 4px 0px 4px !important; margin-left: 2px !important; margin-right: 2px !important;");
+                elem.attr("style", elem.attr("style") + ";padding: 2px 4px 0px 4px !important; margin-left: 2px !important; margin-right: 2px !important;");
             }
             else {
-                elem.attr("style", "margin-left: 2px !important; margin-right: 2px !important;");
+                elem.attr("style", elem.attr("style") + ";margin-left: 2px !important; margin-right: 2px !important;");
             }
-            parentElem.prepend(elem);
 
+            if(shouldAppend) {
+                parentElem.append(elem);
+            }
+            else {
+                parentElem.prepend(elem);
+            }
             return elem;
         };
     }
@@ -284,14 +289,145 @@
         }
     };
 
+    class SupportExtension extends DomExtension {
+        __initializeFields() {
+            this.SupportCaseIndicator = '<span class="status" style="background-color: #e62121 !important">Support Related Case</span></h1>';
+            this.AddWaitingCustomer = '<span class="status active" style="margin-top: 2px !important; cursor: pointer">Add Waiting Customer</span></h1>';
+            this.OpenWaitingCustomers = '<span class="status resolved" style="margin-top: 8px !important; cursor: pointer">Open Waiting Customers</span></h1>';
+        }
+
+        _openWaitingCustomers(urlBuilder) {
+            var waitingCustomers = this.tags.filter((tag) => tag.startsWith("zd"));
+
+            for(var i in waitingCustomers) {
+                var zendeskUrl = urlBuilder(waitingCustomers[i].replace("zd",""));
+                window.open(zendeskUrl, '_blank');
+            }
+        }
+
+        _addWaitingCustomer() {
+            var editAction = $('.case .controls [name=edit]').first();
+
+            if(editAction.length == 0) {
+                return;
+            }
+
+            editAction.click();
+
+            var handle = window.setInterval(function() {
+                //<input type="hidden" name="tags" class="droplist-storage-input" value="[&quot;support&quot;,&quot;test&quot;]">
+
+                var tagsElem = $('input[name=tags]');
+
+                if(tagsElem.length == 0) {
+                    return;
+                }
+
+                window.clearInterval(handle);
+
+                var zendeskId = prompt("Please enter the Zendesk case id (i.e. 12345)")
+
+                if(!zendeskId || isNaN(zendeskId)) {
+                    $('#btnCancel').click();
+                    return;
+                }
+
+                $('#sidebarTags .droplist-input').focus().val("zd"+zendeskId).blur()
+                $('#btnSubmit').click();
+
+            }, 50);
+        }
+
+        _createGenericControls() {
+            var self = this;
+
+            if(!this._isSupportCase(false) && this._isSupportCase(true)) {
+                super.createDomElementOnce($('header h1'), "<br/>", 'support-controls-br', false, true);
+                super.createDomElementOnce($('header h1'), this.SupportCaseIndicator, 'support-indicator', false, true);
+            }
+
+            super.createDomElementOnce($('.top > .left, .corner'), "<hr/>", 'support-controls-hr', false, true);
+            super.createDomElementOnce($('.top > .left, .corner'), this.AddWaitingCustomer, 'add-waiting-customer', true, true)
+                .off('click')
+                .click(function() {
+                self._addWaitingCustomer();
+            });
+
+            if(this.tags && this.tags.filter((tag) => tag.startsWith("zd")).length > 0) {
+                super.createDomElementOnce($('.top > .left, .corner'), this.OpenWaitingCustomers, 'open-waiting-customers', true, true)
+                    .off('click')
+                    .click(function() {
+                    self._openWaitingCustomers(self._buildZendeskUrl);
+                });
+            }
+        }
+
+        _buildZendeskUrl(zendeskCase) {
+            return "https://netsparker.zendesk.com/agent/tickets/" + zendeskCase;
+        }
+
+        _buildZendeskLink() {
+            if(this.zendeskLink) {
+                return this.zendeskLink;
+            }
+
+            var caseNameSplit = this.caseName.split("ZD#");
+
+            if(caseNameSplit.length != 2) {
+                return;
+            }
+
+            return caseNameSplit[0] + "<a href='" + this._buildZendeskUrl(caseNameSplit[1]) + "' target='_blank' initialized>ZD#" + caseNameSplit[1] + "</a>";
+        }
+
+        _createCaseRelatedControls() {
+            // Cache the built link to prevent re-calculation.
+            this.zendeskLink = this._buildZendeskLink();
+
+            if($('.case .top header > h1 a[initialized]').length == 0) {
+                $('.case .top header > h1').html(this.zendeskLink);
+            }
+        }
+
+        _isSupportCase(checkTags) {
+            return (this.caseName && this.caseName.contains("ZD#")) || (checkTags && this.tags && this.tags.filter(tag => tag.startsWith("support") || tag.startsWith("zd")).length > 0);
+        }
+
+        initialize() {
+            this.caseName = $('.case .top header > h1').text();
+
+            if(!this.caseName) {
+                return;
+            }
+
+            this.tags = $('#sidebarTags li a').map((i, o) => $(o).text()).get();
+
+            this._createGenericControls();
+
+            if(!this._isSupportCase(false)) {
+                return;
+            }
+
+            this._createCaseRelatedControls();
+        }
+    };
+
     class FogbugzExtendedPlugin {
         constructor() {
             var self = this;
 
             $(document).ready(function() {
-                new StyleExtension();
-                new ThemeExtension();
-                FogbugzExtendedPlugin.Extensions = [ new ActionButtonsExtension() ];
+                // Register 'initialize-once' extensions here.
+                this.Extensions = [
+                    new StyleExtension(),
+                    new ThemeExtension(),
+                ];
+
+                // Register live extensions here.
+                FogbugzExtendedPlugin.Extensions = [
+                    new ActionButtonsExtension(),
+                    new SupportExtension(),
+                ];
             });
         }
 
