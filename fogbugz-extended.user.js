@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.5.1
+// @version      1.5.2
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
@@ -367,14 +367,14 @@
         }
 
         _buildZendeskLink() {
-            if(this.zendeskLink) {
-                return this.zendeskLink;
-            }
-
             var caseNameSplit = this.caseName.split("ZD#");
 
             if(caseNameSplit.length != 2) {
                 return;
+            }
+
+            if(this.zendeskLink && this.zendeskLink.startsWith(caseNameSplit[0])) {
+                return this.zendeskLink;
             }
 
             return caseNameSplit[0] + "<a href='" + this._buildZendeskUrl(caseNameSplit[1]) + "' target='_blank' initialized>ZD#" + caseNameSplit[1] + "</a>";
