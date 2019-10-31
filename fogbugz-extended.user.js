@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.5.3
+// @version      1.5.4
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
@@ -219,7 +219,12 @@
                     .removeAttr("href");
             }
             else{
-                actionButton.attr("href", this._buildActionHref(caseNumber, caseState));
+                if(this.readOnly == true) {
+                    actionButton.removeAttr("href");
+                }
+                else {
+                    actionButton.attr("href", this._buildActionHref(caseNumber, caseState));
+                }
             }
 
             var history = this._createHistory(caseState);
@@ -281,9 +286,7 @@
         initialize() {
             var status = $('.status').html();
 
-            if(!status || status.startsWith("Resolved") || status.startsWith("Closed")) {
-                return;
-            }
+            this.readOnly = !status || status.startsWith("Resolved") || status.startsWith("Closed");
 
             this._createActionButtons();
         }
