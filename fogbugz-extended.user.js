@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FogBugz Extended
 // @namespace    https://www.netsparker.com/
-// @version      1.5.2
+// @version      1.5.3
 // @updateURL    https://github.com/aricih/fogbugz-extended/raw/master/fogbugz-extended.user.js
 // @description  Make FogBugz great again!
 // @author       Hakan Arıcı
@@ -189,7 +189,7 @@
                 .parent()
                 .find(".summary")
                 .each(function(i,o) {
-                var person = $(o).find('.person').first().text();
+                var person = $(o).find('.person').last().text();
 
                 if(history.indexOf(person) < 0) {
                     if(history.length > 0) {
